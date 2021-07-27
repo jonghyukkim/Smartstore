@@ -1,0 +1,577 @@
+---
+title: "Progress Report"
+subtitle: "Last week of July"
+author: "JONG"
+date: "`r Sys.Date()`"
+output: 
+  slidy_presentation:
+    keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE,
+                      fig.align = "center")
+
+options(scipen = 999)
+```
+
+
+```{r Package}
+library(tidyverse)
+library(kableExtra)
+library(DT)
+library(readr)
+library(readxl)
+library(janitor)
+library(plotly)
+library(ggthemes)
+library(gridExtra)
+library(gt)
+library(patchwork)
+library(scales)
+library(lubridate)
+```
+
+## Team SOTA 
+```{r figure, fig.align='center', out.width="30%"}
+knitr::include_graphics("fig/sku1.png")
+knitr::include_graphics("fig/sku2.png")
+knitr::include_graphics("fig/sku3.png")
+knitr::include_graphics("fig/sku4.png")
+```
+
+## Role of JS
+
+- Customer Service(CS)
+    - [이지리플](https://www.ezadmin.co.kr/sub_01_08.html)
+    - 문의 유형화. 
+      - Ex) 재입고, 교환, 반품, 기타 등.. -> 주차별 혹은 월별 요약 필요
+    - 각 판매채널 별 교환 및 반품 시스템 정리 및 내규화 필요. 
+      - Ex) 어떤 상황에서 소비자부담으로 할 것인지 어떤 상황에서 판매자 부담으로 할 것인지
+      
+<hr>  
+
+- 재고 관리
+    - 통합 재고 시스템 개발 예정
+    - 상시 관리. 
+      - Ex) 각 판매채널 재고 상시 파악 (품절 임박 상품은 판매자가 해야하기 때문)
+    - 정기 관리. 
+      - Ex) 월 1회 총 재고 현황 파악 
+      
+<hr>  
+
+- 해외 제품 소싱 (중장기 계획)
+    - 제품 별 소싱 시점 파악
+    - 재고 관리와 연계하여 제품 소싱
+    
+<hr>
+
+- 오프라인 제휴 담당 (중장기 계획)
+
+## Role of SH
+
+- Data based decision system
+  - SOTA Item Choice Data base system
+    1. 주 1회 신상품 인스타 업로드 (상품디자인 제외 동일 조건)
+    2. 5일 간의 반응 파악
+    3. 노입고 / 소량입고 / 다량입고 유형화
+    4. 프리오더 시스템 고려
+
+  - SOTA marketing test (A/B test)
+    - 썸네일 
+    - 가격
+    - 인플루언서
+    - etc..
+
+## SOTA Apple Watch strap stock keeping unit (SKU)
+
+```{r SKU_appleband}
+options(DT.options = list(pageLength = 10))
+
+Design1 <- c("모던", "슬림밀레니즈", "싱글투어", "싱글투어new", "MADE싱글투어", "슬림쥬빌레", "라이트메탈", "모던메탈", "싱글체인", "프리미엄", "더블투어", "미니멀더블투어", "MADE슬림레더", "투명레진", "일체형TPU", "분리형TPU", "투명젤로", "슬림형TPU", "링크브레이슬릿", "쥬빌레", "슬림모던메탈", "믹스체인", "더블체인", "더블체인레더", "슬림", "실버볼", "브레이드더블루프")
+
+Size1 <- c("38/40", "42/44")
+
+Color1 <- c("에토프","마일드그레이","마일드브라운","화이트","실버","골드","블랙","그레이","채스넛브라운","플럼/핑크","블루/오렌지","에쉬브라운","다크그레이","오렌지","마린블루","화이트","다크브라운","에토프","스페이스그레이","실버","블루","샌드브라운","브라운","크림","샌드핑크","블랙","채스넛브라운","미니멀블랙","에쉬카키","에토프","브릭오렌지","와인레드","딥브라운","다크블루","투명","실버","스페이스그레이","베이지체크","블랙체크","그레이","블랙","라일락","네이비체크","블랙","라일락","화이트")
+
+expand.grid(Design = Design1, Size = Size1, Color = Color1) %>% 
+  filter(Design == "모던" & Color %in% c("에토프","마일드그레이","마일드브라운","화이트") |
+           Design == "슬림밀레니즈" & Color %in% c("실버","골드","블랙","스페이스그레이") |
+           Design == "싱글투어" & Color %in% c("그레이","채스넛브라운","플럼/핑크","블루/오렌지","에쉬브라운","다크그레이") |
+           Design == "싱글투어new" & Color %in% c("오렌지","마린블루","화이트","다크브라운") |
+           Design == "MADE싱글투어" & Color %in% c("에토프") |
+           Design == "슬림쥬빌레" & Color %in% c("스페이스그레이","실버") |
+           Design == "라이트메탈" & Color %in% c("스페이스그레이","실버") |
+           Design == "모던메탈" & Color %in% c("스페이스그레이","실버") |
+           Design == "싱글체인" & Color %in% c("스페이스그레이","실버") |
+           Design == "프리미엄" & Color %in% c("블루","샌드브라운","브라운","크림","샌드핑크","블랙") |
+           Design == "더블투어" & Color %in% c("블랙","채스넛브라운","에쉬브라운") |
+           Design == "미니멀더블투어" & Color %in% c("미니멀블랙","에쉬카키","화이트") |
+           Design == "MADE슬림레더" & Color %in% c("에토프","브릭오렌지","와인레드","딥브라운","다크블루") |
+           Design == "투명레진" & Color %in% c("투명") |
+           Design == "일체형TPU" & Color %in% c("투명") |
+           Design == "분리형TPU" & Color %in% c("투명") |
+           Design == "투명젤로" & Color %in% c("투명") |
+           Design == "슬림형TPU" & Color %in% c("투명") |
+           Design == "링크브레이슬릿" & Color %in% c("스페이스그레이","실버") |
+           Design == "쥬빌레" & Color %in% c("스페이스그레이","실버") |
+           Design == "슬림모던메탈" & Color %in% c("스페이스그레이","실버") |
+           Design == "믹스체인" & Color %in% c("실버") |
+           Design == "더블체인" & Color %in% c("스페이스그레이","실버") |
+           Design == "더블체인레더" & Color %in% c("스페이스그레이","실버") |
+           Design == "슬림" & Color %in% c("베이지체크","블랙체크","그레이") |
+           Design == "실버볼" & Color %in% c("블랙","그레이","블랙체크","라일락","네이비체크") |
+           Design == "브레이드더블루프" & Color %in% c("블랙","화이트")) %>% 
+  distinct(Design, Size, Color) %>% 
+  arrange(Design) -> apple_band
+
+apple_band %>% 
+  datatable(caption = "SOTA apple watch band SKU", 
+            filter = "top")
+```
+
+- 총 140개의 SKU
+- 27개의 디자인
+    * "모던", "슬림밀레니즈", "싱글투어", "싱글투어new", "MADE싱글투어", "슬림쥬빌레", "라이트메탈", "모던메탈", "싱글체인", "프리미엄", "더블투어", "미니멀더블투어", "MADE슬림레더", "투명레진", "일체형TPU", "분리형TPU", "투명젤로", "슬림형TPU", "링크브레이슬릿", "쥬빌레", "슬림모던메탈", "믹스체인", "더블체인", "더블체인레더", "슬림", "실버볼", "브레이드더블루프"
+- 2가지 사이즈
+- 1 ~ 6가지 색상 옵션
+
+## SOTA Apple Watch Accessories stock keeping unit (SKU)
+
+```{r SKU_appleAccessories}
+options(DT.options = list(pageLength = 10))
+
+Design2 <- c("젤리케이스","범퍼케이스","메탈베젤링","큐빅케이스","애플워치거치대","애플워치파우치")
+
+Size2 <- c("40mm", "44mm", "공통")
+
+Color2 <- c("클리어","블랙","로즈핑크","화이트","로즈골드","실버","코랄핑크","차콜그레이","소프트블루","다크네이비","베이지","그레이")
+
+expand.grid(Design = Design2, Size = Size2, Color = Color2) %>% 
+  filter(Design == "젤리케이스" & Size %in% c("40mm", "44mm") & Color %in% c("클리어") |
+           Design == "범퍼케이스" & Size %in% c("40mm", "44mm") & Color %in% c("클리어","블랙","로즈핑크","화이트") |
+           Design == "메탈베젤링" & Size %in% c("40mm", "44mm") & Color %in% c("블랙","로즈골드","실버") |
+           Design == "큐빅케이스" & Size %in% c("40mm", "44mm") & Color %in% c("클리어","블랙","로즈골드","실버") |
+           Design == "애플워치거치대" & Size %in% c("공통") & Color %in% c("화이트","코랄핑크","차콜그레이","소프트블루","다크네이비") |
+           Design == "애플워치파우치" & Size %in% c("공통") & Color %in% c("블랙","베이지","그레이")) %>% 
+  distinct(Design, Size, Color) %>% 
+  arrange(Design) -> apple_acc
+
+apple_acc %>% 
+  datatable(caption = "SOTA apple watch Accessories SKU", 
+            filter = "top")
+```
+
+- 총 32개의 SKU
+- 6개의 디자인
+    * "젤리케이스","범퍼케이스","메탈베젤링","큐빅케이스","애플워치거치대","애플워치파우치"
+- 1~2가지 사이즈
+- 1 ~5가지 색상 옵션
+
+## SOTA Samsung Watch strap stock keeping unit (SKU)
+
+```{r SKU_samsungband}
+options(DT.options = list(pageLength = 10))
+
+Design3 <- c("가죽 1. 스포츠 스웨이드","가죽 2. 심플레더","가죽 3. 빈티지레더","메탈 1. 밀레니즈 루프","메탈 2. 링크브레이슬릿","메탈 3. 모던 메탈","메탈 4. 쥬빌레 메탈","메탈 5. 라이트 메탈","메탈 6. 싱글 체인")
+
+Size3 <- c("20mm", "22mm")
+
+Color3 <- c("샌드브라운","카멜","블루","블랙","다크브라운","카키","그레이","핑크","브라운","그린","레드","샴페인골드","골드","실버")
+
+expand.grid(Design = Design3, Size = Size3, Color = Color3) %>% 
+  filter(Design == "가죽 1. 스포츠 스웨이드" & Color %in% c("샌드브라운","카멜","블루","블랙","다크브라운") |
+           Design == "가죽 2. 심플레더" & Color %in% c("블루","블랙","카키","그레이","핑크","브라운") |
+           Design == "가죽 3. 빈티지레더" & Color %in% c("블랙","브라운","그린","레드") |
+           Design == "메탈 1. 밀레니즈 루프" & Color %in% c("블랙","샴페인골드","골드","실버") |
+           Design == "메탈 2. 링크브레이슬릿" & Color %in% c("실버") |
+           Design == "메탈 3. 모던 메탈" & Color %in% c("실버") |
+           Design == "메탈 4. 쥬빌레 메탈" & Color %in% c("실버") |
+           Design == "메탈 5. 라이트 메탈" & Color %in% c("실버") |
+           Design == "메탈 6. 싱글 체인" & Color %in% c("실버")) %>% 
+  distinct(Design, Size, Color) %>% 
+  arrange(Design) -> samsung_band
+
+samsung_band %>% 
+  datatable(caption = "SOTA samsung watch band SKU", 
+            filter = "top")
+```
+
+- 총 48개의 SKU
+- 9개의 디자인
+    * "가죽 1. 스포츠 스웨이드","가죽 2. 심플레더","가죽 3. 빈티지레더","메탈 1. 밀레니즈 루프","메탈 2. 링크브레이슬릿","메탈 3. 모던 메탈","메탈 4. 쥬빌레 메탈","메탈 5. 라이트 메탈","메탈 6. 싱글 체인"
+- 2가지 사이즈
+- 1 ~ 6가지 색상 옵션
+
+## SOTA Airtag case stock keeping unit (SKU)
+
+```{r SKU_airtag}
+options(DT.options = list(pageLength = 10))
+
+Design4 <- c("실리콘기본","가죽기본","실리콘루프","가죽루프","가죽스티치러거지택","가죽스티치키링","가죽스티치백참")
+
+Color4 <- c("화이트","옐로우","핑크","레드","그린","블루","다크그레이","블랙","오렌지","마일드그레이","체스넛브라운","에메랄드","딥오렌지","퍼플")
+
+expand.grid(Design = Design4, Color = Color4) %>% 
+  filter(Design == "실리콘기본" & Color %in% c("화이트","옐로우","핑크","레드","그린","블루","마일드그레이","블랙") |
+           Design == "가죽기본" & Color %in% c("화이트","옐로우","핑크","레드","그린","블루","다크그레이","블랙","오렌지","체스넛브라운") |
+           Design == "실리콘루프" & Color %in% c("화이트","옐로우","핑크","그린","다크그레이","블랙","에메랄드","딥오렌지","퍼플") |
+           Design == "가죽루프" & Color %in% c("블랙","레드","옐로우","블루","체스넛브라운") |
+           Design == "가죽스티치러거지택" & Color %in% c("체스넛브라운") |
+           Design == "가죽스티치키링" & Color %in% c("블랙","오렌지") |
+           Design == "가죽스티치백참" & Color %in% c("블랙","오렌지","체스넛브라운")) %>% 
+  distinct(Design, Color) %>% 
+  arrange(Design) -> airtag
+
+airtag %>% 
+  datatable(caption = "SOTA Airtag Case SKU", 
+            filter = "top")
+```
+
+- 총 38개의 SKU
+- 7개의 디자인
+    * "실리콘기본","가죽기본","실리콘루프","가죽루프","가죽스티치러거지택","가죽스티치키링","가죽스티치백참"
+- 1가지 사이즈
+- 1 ~ 10가지 색상 옵션
+
+## Total SKU (258개)
+
+```{r}
+set.seed(2021)
+
+apple_band %>% 
+  rbind(apple_acc) %>% 
+  rbind(samsung_band) %>% 
+  rbind(airtag %>% mutate(Size = "공통")) %>% 
+  rowwise() %>% 
+  mutate(Barcode = runif(1, min = 1000000, max = 9999999) %>% round(),
+         Total_N = 0) %>% 
+  datatable(caption = "SOTA Total SKU", 
+            filter = "top")
+```
+
+```{r}
+`판매_성과` <- read_xlsx("data/판매성과_2021-01-01_2021-07-24.xlsx") 
+
+`상품_인구통계` <- read_xlsx("data/상품_인구통계_2021-01-01_2021-07-24.xlsx")
+`상품_고객_결혼상태` <- read_xlsx("data/상품_고객프로파일_결혼상태_2021-01-01_2021-07-24.xlsx")
+`상품_고객_가구당인원` <- read_xlsx("data/상품_고객프로파일_가구당인원_2021-01-01_2021-07-24.xlsx")
+`상품_고객_직업` <- read_xlsx("data/상품_고객프로파일_직업_2021-01-01_2021-07-24.xlsx")
+`상품_고객_자녀나이` <- read_xlsx("data/상품_고객프로파일_자녀나이_2021-01-01_2021-07-24.xlsx")
+`상품_지역` <- read_xlsx("data/상품_지역_2021-01-01_2021-07-24.xlsx")
+`상품_성과` <- read_xlsx("data/상품성과_2021-01-01_2021-07-24.xlsx")
+`상품_마케팅` <- read_xlsx("data/상품_마케팅채널_2021-01-01_2021-07-24.xlsx")
+`상품_검색채널` <- read_xlsx("data/상품_검색채널_2021-01-01_2021-07-24.xlsx")
+
+`검색채널` <- read_xlsx("data/검색채널_2021-01-01_2021-07-24.xlsx")  
+`웹사이트채널` <- read_xlsx("data/웹사이트채널_2021-01-01_2021-07-24.xlsx")  
+`인구통계` <- read_xlsx("data/인구통계_2021-01-01_2021-07-24.xlsx")  
+`시간대별` <- read_xlsx("data/시간대별_2021-01-01_2021-07-24.xlsx")  
+`상품별` <- read_xlsx("data/상품별_2021-01-01_2021-07-24.xlsx")  
+`판매성과` <- read_xlsx("data/판매성과_2021-01-01_2021-07-24.xlsx")  
+`고객현황_통계` <- read_csv("data/통계_고객현황_202101_202107.csv")  
+```
+
+## Competitor Analysis (우먼스9999)
+
+- Strength
+  - 700개 이상의 SKU(다양한 소비자층)
+  - 압도적인 이벤트(증정품, 리뷰이벤트 등)
+  - 공격적인 마케팅
+  - 다양한 애플 기반 악세서리
+
+- Weakness
+  - 브랜딩
+ 
+```{r figure2, fig.align='center', out.width="60%"}
+knitr::include_graphics("fig/womans.png")
+
+```
+
+## SmartStore Analysis (1~7월)
+
+## 매출 추세
+
+```{r sales, out.width = '100%'}
+datebreaks <- seq(as.Date("2021-01-01"), as.Date("2021-07-24"), by="15 days")
+
+gg_a <- `판매_성과` %>% 
+  mutate(`날짜` = as.Date(`날짜`)) %>% 
+  group_by(`날짜`) %>% 
+  summarise(`결제금액` = sum(`결제금액`)) %>% 
+  ggplot(aes(x=`날짜`, y=`결제금액`)) +
+  geom_point() +
+  geom_line(aes(group=1)) +
+  labs(x = "", title = "일별 결제 금액 추세", subtitle = "2021/01/01 ~ 2021/06/30") +
+  scale_x_date(breaks=datebreaks) +
+  scale_y_continuous(breaks = seq(0, 150000000, by = 1000000)) +
+  theme(plot.title = element_text(hjust = 0.5, size=15, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5, size=12, face = "bold"),
+        axis.title = element_text(face = "bold"),
+        axis.text = element_text(face = "bold"),
+        strip.text = element_text(face = "bold"),
+        strip.background = element_rect(fill = "gray"),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggplotly(gg_a)
+```
+
+<hr>
+<div style="margin-bottom:50px;">
+</div>
+
+- 6월 17일 브랜드 카탈로그 알고르즘 변경 (-)
+- 6월 21,22,23일 (?)
+- 6월 26일 모던페이지에 메탈 통합 (+)
+- 7월 1일 가구매 작업 
+- 7월 3일 메탈 페이지 판매 금지 (-)
+- 7월 7일 메탈 페이지 복구 
+- 7월 13일 썸넬 가격 변경 (+)
+- 7월 21일 파격세일 이벤트 실행 (-)
+
+
+## 요일별 판매 차이
+
+```{r dow, out.width = '100%'}
+gg_b <- `판매_성과` %>% 
+  group_by(`요일`) %>% 
+  summarise(`표준편차` = sd(`결제금액`, na.rm = T),
+            `결제금액` = mean(`결제금액`, na.rm = T)) %>%
+  mutate(`요일` = factor(`요일`, levels=c("월","화","수","목","금","토","일"))) %>% 
+  ggplot(aes(x=`요일`, y=`결제금액`)) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(aes(x=`요일`, ymin=`결제금액`-`표준편차`, ymax=`결제금액`+`표준편차`)) +
+  theme_minimal() +
+  labs(x = "", title = "요일별 결제 금액", subtitle = "2021/01/01~2021/07/24") +
+  theme(plot.title = element_text(hjust = 0.5, size=15, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5, size=12, face = "bold"),
+        axis.title = element_text(size=10, face = "bold"),
+        strip.text.x = element_text(size=10, face = "bold"),
+        axis.text.x = element_text(size=13, face = "bold"))
+
+ggplotly(gg_b)
+
+gg_b2 <- `판매_성과` %>% 
+  mutate(`월` = month(`날짜`)) %>% 
+  group_by(`월`, `요일`) %>% 
+  summarise(`표준편차` = sd(`결제금액`, na.rm = T),
+            `결제금액` = mean(`결제금액`, na.rm = T)) %>%
+  mutate(`요일` = factor(`요일`, levels=c("월","화","수","목","금","토","일"))) %>% 
+  ggplot(aes(x=`요일`, y=`결제금액`)) +
+  geom_bar(stat = "identity") +
+  facet_wrap( ~ `월`) +
+  theme_bw() +
+  labs(x = "", title = "월/요일별 결제 금액", subtitle = "2021/01/01~2021/07/24") +
+  theme(plot.title = element_text(hjust = 0.5, size=15, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5, size=12, face = "bold"),
+        axis.title = element_text(size=10, face = "bold"),
+        strip.text.x = element_text(size=10, face = "bold"),
+        strip.background = element_rect(color = "gray"),
+        axis.text.x = element_text(size=13, face = "bold"))
+
+ggplotly(gg_b2)
+```
+
+<hr>
+<div style="margin-bottom:50px;">
+</div>
+
+- 전체적으로 금,토 매출이 낮고 일~목요일 매출이 일정함
+- 유입수 때문(?)
+
+## 시간대별 판매 차이
+
+```{r time, out.width = '100%'}
+`시간대별` %>% 
+  group_by(`요일`) %>% 
+  summarise(`유입수` = sum(`유입수`, na.rm = T),
+            `결제수(마지막클릭)` = sum(`결제수(마지막클릭)`, na.rm = T)) %>% 
+  mutate(`유입당 결제율` = `결제수(마지막클릭)`/`유입수`) %>% 
+  arrange(desc(`유입수`)) %>% 
+  gt() %>%
+  data_color(
+    columns = vars(`유입당 결제율`),
+    colors = scales::col_numeric(
+      palette = c("white", "yellow", "red"),
+      domain = c(0, 0.035))
+  )
+
+`시간대별` %>% 
+  group_by(`시간대`) %>% 
+  summarise(`유입수` = sum(`유입수`, na.rm = T),
+            `결제수(마지막클릭)` = sum(`결제수(마지막클릭)`, na.rm = T)) %>% 
+  mutate(`유입당 결제율` = `결제수(마지막클릭)`/`유입수`) %>% 
+  arrange(`시간대`) %>% 
+  gt() %>%
+  data_color(
+    columns = vars(`유입당 결제율`),
+    colors = scales::col_numeric(
+      palette = c("white", "yellow", "red"),
+      domain = c(0, 0.045))
+  )
+```
+
+<hr>
+<div style="margin-bottom:50px;">
+</div>
+
+- 금,토 유입수가 다른 요일에 비해서 적음 
+- 유입당 결제율도 월,화가 비교적 높음
+
+## 월별 평균 환불 비율
+
+```{r refund, out.width = '100%'}
+gg_c <- `판매_성과` %>% 
+  mutate(`날짜` = as.Date(`날짜`)) %>% 
+  mutate(Month = month(`날짜`)) %>% 
+  group_by(Month) %>% 
+  summarise(`결제금액` = sum(`결제금액`),
+            `환불금액` = sum(`환불금액`)) %>% 
+  gather(key=type, value=value, 2:3) %>% 
+  ggplot(aes(x=Month,y=value,group=type)) +
+  geom_point(aes(color=type)) +
+  geom_line(aes(color=type)) +
+  scale_color_brewer(palette = "Set2") +
+  labs( y = NULL, title="월별 결제 금액 및 환불 금액") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, size=15, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5, size=12, face = "bold"),
+        axis.title = element_text(size=10, face = "bold"),
+        strip.text.x = element_text(size=10, face = "bold"))
+
+ggplotly(gg_c)
+
+`판매_성과` %>% 
+  mutate(`날짜` = as.Date(`날짜`)) %>% 
+  mutate(Month = month(`날짜`)) %>% 
+  group_by(Month) %>% 
+  summarise(`결제금액` = sum(`결제금액`),
+            `환불금액` = sum(`환불금액`)) %>% 
+  mutate(`환불비율` = round(`환불금액`/`결제금액`,3) * 100) %>% 
+  gt()
+```
+
+<hr>
+<div style="margin-bottom:50px;">
+</div>
+
+- 환불 사유 파악 필요 (유형화)
+- 교환 및 환불 줄일 수 있는 시스템 갖추어야 함 ex) 검수작업 및 환불 및 교환 내규
+
+## 상품 고객 프로파일
+
+```{r customoer, out.width = '80%'}
+a <- `상품_고객_결혼상태` %>% 
+  group_by(`결혼상태`) %>% 
+  summarise(`결제금액` = mean(`결제금액`)) %>% 
+  ggplot(aes(x="", y=`결제금액`, fill=`결혼상태`)) +
+  geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0) +
+  # geom_text(aes(label = paste0(round(`결제금액`/sum(`결제금액`),3)*100, "%")), position = position_stack(vjust = 0.5)) +
+  scale_fill_brewer(palette = "Accent") +
+  labs(x = NULL, y = NULL, title="주요 고객 결혼상태 비율") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, size=15, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5, size=12, face = "bold"),
+        axis.line = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_text(size=20, face = "bold"),
+        strip.text.x = element_text(size=10, face = "bold"))
+  
+
+b <- `상품_고객_가구당인원` %>% 
+  group_by(`가구당인원`) %>% 
+  summarise(`결제금액` = mean(`결제금액`)) %>% 
+  ggplot(aes(x="", y=`결제금액`, fill=`가구당인원`)) +
+  geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0) +
+  # geom_text(aes(label = paste0(round(`결제금액`/sum(`결제금액`),3)*100, "%")), position = position_stack(vjust = 0.5)) +
+  scale_fill_brewer(palette = "Pastel1") +
+  labs(x = NULL, y = NULL, title="주요 고객 가구당인원 비율") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, size=15, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5, size=12, face = "bold"),
+        axis.line = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_text(size=20, face = "bold"),
+        strip.text.x = element_text(size=10, face = "bold"))
+
+c <- `상품_고객_직업` %>% 
+  group_by(`직업`) %>% 
+  summarise(`결제금액` = mean(`결제금액`)) %>% 
+  ggplot(aes(x="", y=`결제금액`, fill=`직업`)) +
+  geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0) +
+  # geom_text(aes(label = paste0(round(`결제금액`/sum(`결제금액`),3)*100, "%")), position = position_stack(vjust = 0.5)) +
+  scale_fill_brewer(palette = "Pastel2") +
+  labs(x = NULL, y = NULL, title="주요 고객 직업 비율") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, size=15, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5, size=12, face = "bold"),
+        axis.line = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_text(size=20, face = "bold"),
+        strip.text.x = element_text(size=10, face = "bold"))
+
+d <- `상품_지역` %>% 
+  group_by(`지역(소)`) %>% 
+  summarise(`결제금액` = mean(`결제금액`)) %>% 
+  arrange(desc(`결제금액`)) %>% 
+  slice(1:10) %>% 
+  ggplot(aes(x="", y=`결제금액`, fill=`지역(소)`)) +
+  geom_bar(stat="identity", width=1) +
+  coord_polar("y", start=0) +
+  # geom_text(aes(label = paste0(round(`결제금액`/sum(`결제금액`),3)*100, "%")), position = position_stack(vjust = 0.5)) +
+  scale_fill_brewer(palette = "Set3") +
+  labs(x = NULL, y = NULL, title="주요 고객 거주지 비율", subtitle = "Top10") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5, size=15, face = "bold"),
+        plot.subtitle = element_text(hjust = 0.5, size=12, face = "bold"),
+        axis.line = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_text(size=20, face = "bold"),
+        strip.text.x = element_text(size=10, face = "bold"))
+
+grid.arrange(c,d,a,b,nrow=2)
+```
+
+<hr>
+<div style="margin-bottom:50px;">
+</div>
+
+- 강남구, 서초구, 송파구 주요 거주지
+- 오프라인 입점 시 고려사항 
+
+
+## 검색 키워드 (TOP 30)
+
+```{r keyword, out.width='100%'}
+`검색채널` %>% 
+  group_by(`키워드`) %>% 
+  summarise(`유입수` = sum(`유입수`),
+            `결제수(마지막클릭)` = sum(`결제수(마지막클릭)`)) %>% 
+  mutate(`유입당 결제율` = `결제수(마지막클릭)`/`유입수`) %>% 
+  arrange(desc(`유입수`),desc(`유입당 결제율`)) %>% 
+  slice(1:30) %>% 
+  gt() %>%
+  data_color(
+    columns = vars(`유입당 결제율`),
+    colors = scales::col_numeric(
+      palette = c(
+        "white", "orange", "red"),
+      domain = c(0, 0.046))
+  )
+```
+
+<hr>
+<div style="margin-bottom:50px;">
+</div>
+
+- 
+- 
